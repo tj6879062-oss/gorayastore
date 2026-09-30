@@ -1,0 +1,3799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Goraya Store - Admin Panel</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:#050816;
+    color:white;
+    overflow-x:hidden;
+}
+
+/* BACKGROUND */
+#stars{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    z-index:-2;
+}
+
+.star{
+    position:absolute;
+    width:3px;
+    height:3px;
+    background:white;
+    border-radius:50%;
+    opacity:.7;
+    animation:moveStar linear infinite;
+}
+
+@keyframes moveStar{
+    from{
+        transform:translateY(-20px);
+        opacity:.2;
+    }
+    50%{
+        opacity:1;
+    }
+    to{
+        transform:translateY(110vh);
+        opacity:.1;
+    }
+}
+
+.glow{
+    position:fixed;
+    width:500px;
+    height:500px;
+    border-radius:50%;
+    background:rgba(0,110,255,.12);
+    filter:blur(100px);
+    top:-150px;
+    left:-150px;
+    z-index:-1;
+}
+
+/* LOGIN */
+#loginScreen{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.loginBox{
+    width:390px;
+    max-width:100%;
+    background:rgba(15,23,42,.88);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:22px;
+    padding:35px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+    backdrop-filter:blur(15px);
+}
+
+.loginBox h1{
+    text-align:center;
+    margin-bottom:8px;
+    font-size:30px;
+}
+
+.loginBox p{
+    text-align:center;
+    color:#aeb9ca;
+    margin-bottom:25px;
+}
+
+input,select,textarea{
+    width:100%;
+    padding:12px 14px;
+    margin-top:7px;
+    margin-bottom:15px;
+    border:1px solid #334155;
+    background:#0f172a;
+    color:white;
+    border-radius:10px;
+    outline:none;
+}
+
+input:focus,select:focus,textarea:focus{
+    border-color:#38bdf8;
+}
+
+label{
+    font-size:14px;
+    color:#cbd5e1;
+}
+
+button{
+    border:0;
+    padding:11px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    color:white;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    font-weight:bold;
+    transition:.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 25px rgba(37,99,235,.3);
+}
+
+.btnGreen{
+    background:linear-gradient(135deg,#059669,#16a34a);
+}
+
+.btnRed{
+    background:linear-gradient(135deg,#dc2626,#991b1b);
+}
+
+.btnOrange{
+    background:linear-gradient(135deg,#ea580c,#f59e0b);
+}
+
+.btnGray{
+    background:#334155;
+}
+
+.smallBtn{
+    padding:7px 10px;
+    font-size:12px;
+}
+
+/* APP */
+#app{
+    display:none;
+    min-height:100vh;
+}
+
+.topbar{
+    height:70px;
+    background:rgba(2,6,23,.92);
+    border-bottom:1px solid #1e293b;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 25px;
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:bold;
+}
+
+.logo span{
+    color:#38bdf8;
+}
+
+.adminInfo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#cbd5e1;
+    font-size:14px;
+}
+
+.layout{
+    display:flex;
+    min-height:calc(100vh - 70px);
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:230px;
+    background:rgba(2,6,23,.94);
+    border-right:1px solid #1e293b;
+    padding:20px 12px;
+    flex-shrink:0;
+}
+
+.navBtn{
+    width:100%;
+    text-align:left;
+    background:transparent;
+    color:#cbd5e1;
+    margin-bottom:7px;
+    border-radius:9px;
+}
+
+.navBtn:hover,
+.navBtn.active{
+    background:rgba(37,99,235,.2);
+    color:white;
+}
+
+.content{
+    flex:1;
+    padding:25px;
+    overflow:hidden;
+}
+
+.section{
+    display:none;
+}
+
+.section.active{
+    display:block;
+}
+
+.sectionTitle{
+    font-size:27px;
+    margin-bottom:20px;
+}
+
+/* CARDS */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:25px;
+}
+
+.stat{
+    background:rgba(15,23,42,.85);
+    border:1px solid #1e293b;
+    border-radius:16px;
+    padding:20px;
+}
+
+.stat h3{
+    color:#94a3b8;
+    font-size:14px;
+    margin-bottom:10px;
+}
+
+.stat strong{
+    font-size:28px;
+}
+
+.panel{
+    background:rgba(15,23,42,.86);
+    border:1px solid #1e293b;
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.panel h3{
+    margin-bottom:15px;
+}
+
+/* TABLE */
+.tableWrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:800px;
+}
+
+th,td{
+    padding:12px 10px;
+    border-bottom:1px solid #1e293b;
+    text-align:left;
+    vertical-align:middle;
+}
+
+th{
+    color:#94a3b8;
+    font-size:13px;
+}
+
+td{
+    font-size:14px;
+}
+
+.badge{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.badgeGreen{
+    background:rgba(22,163,74,.18);
+    color:#4ade80;
+}
+
+.badgeRed{
+    background:rgba(220,38,38,.18);
+    color:#f87171;
+}
+
+.badgeOrange{
+    background:rgba(234,88,12,.18);
+    color:#fb923c;
+}
+
+.badgeBlue{
+    background:rgba(37,99,235,.18);
+    color:#60a5fa;
+}
+
+/* GRID */
+.grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.grid3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+/* MODAL */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    z-index:100;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.modalBox{
+    width:650px;
+    max-width:100%;
+    max-height:90vh;
+    overflow-y:auto;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:18px;
+    padding:25px;
+}
+
+.modalHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.close{
+    background:#334155;
+    padding:6px 10px;
+}
+
+/* PRODUCT IMAGE */
+.productImg{
+    width:55px;
+    height:55px;
+    object-fit:cover;
+    border-radius:8px;
+    background:#1e293b;
+}
+
+/* RESPONSIVE */
+@media(max-width:1000px){
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .grid3{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:750px){
+    .sidebar{
+        width:65px;
+        padding:10px 5px;
+    }
+
+    .navBtn{
+        font-size:0;
+        text-align:center;
+    }
+
+    .navBtn::first-letter{
+        font-size:18px;
+    }
+
+    .content{
+        padding:15px;
+    }
+
+    .topbar{
+        padding:0 12px;
+    }
+
+    .adminInfo{
+        font-size:11px;
+    }
+
+    .stats,
+    .grid2,
+    .grid3{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="stars"></div>
+<div class="glow"></div>
+
+<!-- ================= LOGIN ================= -->
+
+<div id="loginScreen">
+
+    <div class="loginBox">
+
+        <h1>Goraya Store</h1>
+        <p>Admin Panel Login</p>
+
+        <label>Admin ID / Username</label>
+        <input id="loginUsername" type="text" placeholder="admin">
+
+        <label>Password</label>
+        <input id="loginPassword" type="password" placeholder="12345">
+
+        <button onclick="login()" style="width:100%;">
+            Login
+        </button>
+
+        <p style="margin-top:18px;margin-bottom:0;font-size:12px;">
+            Default: admin / 12345
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ================= APP ================= -->
+
+<div id="app">
+
+    <div class="topbar">
+
+        <div class="logo">
+            Goraya <span>Store</span>
+        </div>
+
+        <div class="adminInfo">
+            <span id="topAdminName">Admin</span>
+            <button class="btnRed smallBtn" onclick="logout()">
+                Logout
+            </button>
+        </div>
+
+    </div>
+
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <button class="navBtn active" onclick="showSection('dashboard',this)">
+                📊 Dashboard
+            </button>
+
+            <button class="navBtn" onclick="showSection('customers',this)">
+                👥 Customers
+            </button>
+
+            <button class="navBtn" onclick="showSection('suppliers',this)">
+                🏪 Suppliers
+            </button>
+
+            <button class="navBtn" onclick="showSection('products',this)">
+                📦 Products
+            </button>
+
+            <button class="navBtn" onclick="showSection('orders',this)">
+                🛒 Orders
+            </button>
+
+            <button class="navBtn" onclick="showSection('sales',this)">
+                💰 Sales
+            </button>
+
+            <button class="navBtn" onclick="showSection('payments',this)">
+                💳 Payment Settings
+            </button>
+
+            <button class="navBtn" onclick="showSection('ledger',this)">
+                📒 Ledger
+            </button>
+
+            <button class="navBtn" onclick="showSection('admins',this)">
+                🔐 Admin Account
+            </button>
+
+        </aside>
+
+
+        <!-- CONTENT -->
+
+        <main class="content">
+
+            <!-- DASHBOARD -->
+
+            <section id="dashboard" class="section active">
+
+                <h2 class="sectionTitle">
+                    Dashboard
+                </h2>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <h3>Total Customers</h3>
+                        <strong id="statCustomers">0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Total Suppliers</h3>
+                        <strong id="statSuppliers">0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Total Products</h3>
+                        <strong id="statProducts">0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Total Orders</h3>
+                        <strong id="statOrders">0</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <h3>Today's Customers</h3>
+                        <strong id="statTodayCustomers">0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Today's Orders</h3>
+                        <strong id="statTodayOrders">0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Total Sales</h3>
+                        <strong id="statSales">Rs 0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Goraya Commission</h3>
+                        <strong id="statCommission">Rs 0</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <h3>System Information</h3>
+
+                    <p style="color:#94a3b8;line-height:1.8;">
+                        Goraya Store Admin Panel is connected with
+                        the same localStorage data used by the
+                        Customer and Supplier panels.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- CUSTOMERS -->
+
+            <section id="customers" class="section">
+
+                <h2 class="sectionTitle">
+                    Customers
+                </h2>
+
+                <div class="panel">
+
+                    <div class="tableWrap">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>City</th>
+                                    <th>Login Count</th>
+                                    <th>Last Login</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="customersTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SUPPLIERS -->
+
+            <section id="suppliers" class="section">
+
+                <h2 class="sectionTitle">
+                    Suppliers
+                </h2>
+
+                <div class="panel">
+
+                    <button onclick="openSupplierModal()">
+                        + Add Supplier
+                    </button>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="tableWrap">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Supplier ID</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>CNIC</th>
+                                    <th>Login Count</th>
+                                    <th>Last Login</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="suppliersTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- PRODUCTS -->
+
+            <section id="products" class="section">
+
+                <h2 class="sectionTitle">
+                    Products
+                </h2>
+
+                <div class="panel">
+
+                    <!-- THIS BUTTON WILL ALWAYS BE HERE -->
+
+                    <button onclick="openProductModal()">
+                        + Add Product
+                    </button>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="tableWrap">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Product ID</th>
+                                    <th>Name</th>
+                                    <th>Supplier</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Approval</th>
+                                    <th>Active</th>
+                                    <th>Actions</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="productsTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ORDERS -->
+
+            <section id="orders" class="section">
+
+                <h2 class="sectionTitle">
+                    Orders
+                </h2>
+
+                <div class="panel">
+
+                    <div class="tableWrap">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Supplier</th>
+                                    <th>Qty</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="ordersTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SALES -->
+
+            <section id="sales" class="section">
+
+                <h2 class="sectionTitle">
+                    Sales
+                </h2>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <h3>Total Sales</h3>
+                        <strong id="salesTotal">Rs 0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Supplier Share 90%</h3>
+                        <strong id="supplierShare">Rs 0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Goraya Share 10%</h3>
+                        <strong id="gorayaShare">Rs 0</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <h3>Sales Records</h3>
+
+                    <div class="tableWrap">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Order</th>
+                                    <th>Product</th>
+                                    <th>Supplier</th>
+                                    <th>Amount</th>
+                                    <th>Supplier 90%</th>
+                                    <th>Goraya 10%</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="salesTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- PAYMENTS -->
+
+            <section id="payments" class="section">
+
+                <h2 class="sectionTitle">
+                    Payment Settings
+                </h2>
+
+                <div class="panel">
+
+                    <h3>Customer Payment Information</h3>
+
+                    <label>Payment Method</label>
+
+                    <select id="paymentMethod">
+
+                        <option value="Cash on Delivery">
+                            Cash on Delivery
+                        </option>
+
+                        <option value="Bank Transfer">
+                            Bank Transfer
+                        </option>
+
+                        <option value="EasyPaisa">
+                            EasyPaisa
+                        </option>
+
+                        <option value="JazzCash">
+                            JazzCash
+                        </option>
+
+                    </select>
+
+
+                    <label>Account / Number</label>
+
+                    <input
+                        id="paymentAccount"
+                        placeholder="03xxxxxxxxx"
+                    >
+
+
+                    <label>Account Holder Name</label>
+
+                    <input
+                        id="paymentName"
+                        placeholder="Account Holder Name"
+                    >
+
+
+                    <label>Bank Name</label>
+
+                    <input
+                        id="paymentBank"
+                        placeholder="Bank name"
+                    >
+
+
+                    <label>Payment Instructions</label>
+
+                    <textarea
+                        id="paymentInstructions"
+                        rows="5"
+                        placeholder="Payment instructions..."
+                    ></textarea>
+
+
+                    <button onclick="savePayments()">
+                        Save Payment Settings
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- LEDGER -->
+
+            <section id="ledger" class="section">
+
+                <h2 class="sectionTitle">
+                    Ledger
+                </h2>
+
+                <div class="panel">
+
+                    <label>Select Date</label>
+
+                    <input
+                        type="date"
+                        id="ledgerDate"
+                        onchange="renderLedger()"
+                    >
+
+                </div>
+
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <h3>Orders</h3>
+                        <strong id="ledgerOrders">0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Sales</h3>
+                        <strong id="ledgerSales">Rs 0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Supplier 90%</h3>
+                        <strong id="ledgerSupplier">Rs 0</strong>
+                    </div>
+
+                    <div class="stat">
+                        <h3>Goraya 10%</h3>
+                        <strong id="ledgerGoraya">Rs 0</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="tableWrap">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Supplier</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="ledgerTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ADMIN ACCOUNT -->
+
+            <section id="admins" class="section">
+
+                <h2 class="sectionTitle">
+                    Admin Account
+                </h2>
+
+
+                <div class="grid2">
+
+                    <div class="panel">
+
+                        <h3>Change Admin ID</h3>
+
+                        <p style="color:#94a3b8;margin-bottom:15px;">
+                            Yahan se apna login username / ID change kar sakte ho.
+                        </p>
+
+                        <label>New Admin ID</label>
+
+                        <input
+                            id="newAdminUsername"
+                            placeholder="New admin ID"
+                        >
+
+                        <button onclick="changeAdminUsername()">
+                            Change Admin ID
+                        </button>
+
+                    </div>
+
+
+                    <div class="panel">
+
+                        <h3>Change Password</h3>
+
+                        <p style="color:#94a3b8;margin-bottom:15px;">
+                            Apna admin password yahan change karo.
+                        </p>
+
+                        <label>Current Password</label>
+
+                        <input
+                            id="currentAdminPassword"
+                            type="password"
+                        >
+
+                        <label>New Password</label>
+
+                        <input
+                            id="newAdminPassword"
+                            type="password"
+                        >
+
+                        <label>Confirm New Password</label>
+
+                        <input
+                            id="confirmAdminPassword"
+                            type="password"
+                        >
+
+                        <button onclick="changeAdminPassword()">
+                            Change Password
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <h3>Current Admin Information</h3>
+
+                    <p>
+                        Admin ID:
+                        <strong id="currentAdminId">
+                            -
+                        </strong>
+                    </p>
+
+                    <p style="margin-top:10px;">
+                        Admin Name:
+                        <strong id="currentAdminName">
+                            -
+                        </strong>
+                    </p>
+
+                    <p style="margin-top:10px;color:#94a3b8;">
+                        Password security ke liye password yahan show nahi kiya ja raha.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</div>
+
+
+<!-- ================= SUPPLIER MODAL ================= -->
+
+<div id="supplierModal" class="modal">
+
+    <div class="modalBox">
+
+        <div class="modalHeader">
+
+            <h2 id="supplierModalTitle">
+                Add Supplier
+            </h2>
+
+            <button class="close" onclick="closeSupplierModal()">
+                ✕
+            </button>
+
+        </div>
+
+
+        <input type="hidden" id="editSupplierId">
+
+
+        <label>Supplier ID</label>
+
+        <input
+            id="supplierId"
+            placeholder="SUP001"
+        >
+
+
+        <label>Name</label>
+
+        <input
+            id="supplierName"
+            placeholder="Supplier name"
+        >
+
+
+        <label>Phone</label>
+
+        <input
+            id="supplierPhone"
+            placeholder="03xxxxxxxxx"
+        >
+
+
+        <label>CNIC</label>
+
+        <input
+            id="supplierCNIC"
+            placeholder="xxxxx-xxxxxxx-x"
+        >
+
+
+        <label>Password</label>
+
+        <input
+            id="supplierPassword"
+            type="text"
+            placeholder="Supplier password"
+        >
+
+
+        <div style="display:flex;gap:10px;">
+
+            <button onclick="saveSupplier()">
+                Save Supplier
+            </button>
+
+            <button
+                class="btnGray"
+                onclick="closeSupplierModal()"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= PRODUCT MODAL ================= -->
+
+<div id="productModal" class="modal">
+
+    <div class="modalBox">
+
+        <div class="modalHeader">
+
+            <h2 id="productModalTitle">
+                Add Product
+            </h2>
+
+            <button class="close" onclick="closeProductModal()">
+                ✕
+            </button>
+
+        </div>
+
+
+        <input type="hidden" id="editProductId">
+
+
+        <label>Product Name</label>
+
+        <input
+            id="productName"
+            placeholder="Product name"
+        >
+
+
+        <label>Supplier</label>
+
+        <select id="productSupplier"></select>
+
+
+        <label>Price</label>
+
+        <input
+            id="productPrice"
+            type="number"
+            placeholder="0"
+        >
+
+
+        <label>Stock</label>
+
+        <input
+            id="productStock"
+            type="number"
+            placeholder="0"
+        >
+
+
+        <label>Description</label>
+
+        <textarea
+            id="productDescription"
+            rows="4"
+            placeholder="Product description"
+        ></textarea>
+
+
+        <label>Product Image</label>
+
+        <input
+            id="productImage"
+            type="file"
+            accept="image/*"
+        >
+
+
+        <div style="display:flex;gap:10px;">
+
+            <button onclick="saveProduct()">
+                Save Product
+            </button>
+
+            <button
+                class="btnGray"
+                onclick="closeProductModal()"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   GORAYA STORE ADMIN
+   ========================================================= */
+
+
+/* STORAGE KEYS */
+
+const K = {
+
+    admins:"gorayaAdmins",
+
+    suppliers:"gorayaSuppliers",
+
+    products:"gorayaProducts",
+
+    orders:"gorayaOrders",
+
+    customers:"gorayaCustomers",
+
+    payments:"gorayaPaymentSettings",
+
+    session:"gorayaAdminSession"
+
+};
+
+
+/* =========================================================
+   BASIC STORAGE FUNCTIONS
+   ========================================================= */
+
+function get(key){
+
+    try{
+
+        const data =
+            localStorage.getItem(key);
+
+        if(!data){
+            return [];
+        }
+
+        return JSON.parse(data);
+
+    }catch(e){
+
+        return [];
+
+    }
+
+}
+
+
+function put(key,data){
+
+    localStorage.setItem(
+        key,
+        JSON.stringify(data)
+    );
+
+}
+
+
+function getObject(key){
+
+    try{
+
+        const data =
+            localStorage.getItem(key);
+
+        if(!data){
+            return {};
+        }
+
+        return JSON.parse(data);
+
+    }catch(e){
+
+        return {};
+
+    }
+
+}
+
+
+/* =========================================================
+   FIRST SETUP
+   ========================================================= */
+
+function setup(){
+
+    let admins = get(K.admins);
+
+    if(!Array.isArray(admins)){
+        admins=[];
+    }
+
+
+    /*
+       IMPORTANT:
+
+       Agar admin account pehle se hai to
+       usko delete nahi karenge.
+
+       Lekin main admin ka username/password
+       ensure karenge taake login kaam kare.
+    */
+
+    let main =
+        admins.find(
+            a =>
+            String(a.username || "")
+            .trim()
+            .toLowerCase()
+            === "admin"
+        );
+
+
+    if(!main){
+
+        admins.unshift({
+
+            id:"ADMIN001",
+
+            name:"Main Admin",
+
+            username:"admin",
+
+            password:"12345",
+
+            createdAt:
+                new Date().toISOString(),
+
+            loginCount:0,
+
+            lastLogin:""
+
+        });
+
+    }else{
+
+        main.username="admin";
+
+        main.password="12345";
+
+        main.name =
+            main.name || "Main Admin";
+
+        main.id =
+            main.id || "ADMIN001";
+
+        main.loginCount =
+            Number(main.loginCount || 0);
+
+    }
+
+
+    put(K.admins,admins);
+
+
+    /* PAYMENT SETTINGS */
+
+    const payment =
+        localStorage.getItem(K.payments);
+
+    if(!payment){
+
+        put(
+            K.payments,
+            {
+                method:"Cash on Delivery",
+                account:"",
+                name:"",
+                bank:"",
+                instructions:""
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+function login(){
+
+    const username =
+        document
+        .getElementById("loginUsername")
+        .value
+        .trim();
+
+    const password =
+        document
+        .getElementById("loginPassword")
+        .value;
+
+
+    if(!username || !password){
+
+        alert(
+            "Admin ID aur Password enter karo."
+        );
+
+        return;
+
+    }
+
+
+    const admins =
+        get(K.admins);
+
+
+    const admin =
+        admins.find(
+            a =>
+            String(a.username || "")
+            .trim()
+            .toLowerCase()
+            ===
+            username.toLowerCase()
+            &&
+            String(a.password || "")
+            ===
+            password
+        );
+
+
+    if(!admin){
+
+        alert(
+            "Wrong Admin ID ya Password.\n\n" +
+            "Default login:\n" +
+            "ID: admin\n" +
+            "Password: 12345"
+        );
+
+        return;
+
+    }
+
+
+    admin.loginCount =
+        Number(admin.loginCount || 0) + 1;
+
+    admin.lastLogin =
+        new Date().toISOString();
+
+
+    put(K.admins,admins);
+
+
+    const session = {
+
+        id:admin.id,
+
+        name:admin.name,
+
+        username:admin.username,
+
+        loginAt:new Date().toISOString()
+
+    };
+
+
+    localStorage.setItem(
+        K.session,
+        JSON.stringify(session)
+    );
+
+
+    openApp();
+
+}
+
+
+/* =========================================================
+   OPEN APP
+   ========================================================= */
+
+function openApp(){
+
+    const session =
+        getObject(K.session);
+
+
+    if(!session || !session.id){
+
+        document
+        .getElementById("loginScreen")
+        .style.display="flex";
+
+        document
+        .getElementById("app")
+        .style.display="none";
+
+        return;
+
+    }
+
+
+    document
+    .getElementById("loginScreen")
+    .style.display="none";
+
+
+    document
+    .getElementById("app")
+    .style.display="block";
+
+
+    document
+    .getElementById("topAdminName")
+    .textContent =
+        session.name ||
+        session.username ||
+        "Admin";
+
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+function logout(){
+
+    localStorage.removeItem(
+        K.session
+    );
+
+    location.reload();
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+function showSection(id,button){
+
+    document
+    .querySelectorAll(".section")
+    .forEach(
+        s => s.classList.remove("active")
+    );
+
+
+    document
+    .getElementById(id)
+    .classList.add("active");
+
+
+    document
+    .querySelectorAll(".navBtn")
+    .forEach(
+        b => b.classList.remove("active")
+    );
+
+
+    if(button){
+        button.classList.add("active");
+    }
+
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+function renderDashboard(){
+
+    const customers =
+        get(K.customers);
+
+    const suppliers =
+        get(K.suppliers);
+
+    const products =
+        get(K.products);
+
+    const orders =
+        get(K.orders);
+
+
+    document
+    .getElementById("statCustomers")
+    .textContent =
+        customers.length;
+
+
+    document
+    .getElementById("statSuppliers")
+    .textContent =
+        suppliers.length;
+
+
+    document
+    .getElementById("statProducts")
+    .textContent =
+        products.length;
+
+
+    document
+    .getElementById("statOrders")
+    .textContent =
+        orders.length;
+
+
+    const today =
+        new Date().toISOString().slice(0,10);
+
+
+    const todayCustomers =
+        customers.filter(
+            c =>
+            String(c.lastLogin || "")
+            .slice(0,10)
+            === today
+        );
+
+
+    const todayOrders =
+        orders.filter(
+            o =>
+            String(o.createdAt || "")
+            .slice(0,10)
+            === today
+        );
+
+
+    const sales =
+        orders.reduce(
+            (sum,o) =>
+            sum + Number(o.amount || 0),
+            0
+        );
+
+
+    const commission =
+        sales * .10;
+
+
+    document
+    .getElementById("statTodayCustomers")
+    .textContent =
+        todayCustomers.length;
+
+
+    document
+    .getElementById("statTodayOrders")
+    .textContent =
+        todayOrders.length;
+
+
+    document
+    .getElementById("statSales")
+    .textContent =
+        "Rs " + sales.toLocaleString();
+
+
+    document
+    .getElementById("statCommission")
+    .textContent =
+        "Rs " +
+        commission.toLocaleString();
+
+}
+
+
+/* =========================================================
+   CUSTOMERS
+   ========================================================= */
+
+function renderCustomers(){
+
+    const customers =
+        get(K.customers);
+
+
+    const tbody =
+        document
+        .getElementById("customersTable");
+
+
+    tbody.innerHTML="";
+
+
+    if(customers.length===0){
+
+        tbody.innerHTML=
+            `<tr>
+                <td colspan="8">
+                    No customers found.
+                </td>
+            </tr>`;
+
+        return;
+
+    }
+
+
+    customers.forEach(c=>{
+
+        const tr =
+            document.createElement("tr");
+
+
+        const active =
+            c.active !== false;
+
+
+        tr.innerHTML = `
+
+            <td>${escapeHTML(c.id || "-")}</td>
+
+            <td>${escapeHTML(c.name || "-")}</td>
+
+            <td>${escapeHTML(c.email || "-")}</td>
+
+            <td>${escapeHTML(c.phone || "-")}</td>
+
+            <td>${escapeHTML(c.city || "-")}</td>
+
+            <td>${Number(c.loginCount || 0)}</td>
+
+            <td>
+                ${
+                    c.lastLogin
+                    ?
+                    formatDate(c.lastLogin)
+                    :
+                    "-"
+                }
+            </td>
+
+            <td>
+                <span class="badge ${
+                    active
+                    ?
+                    "badgeGreen"
+                    :
+                    "badgeRed"
+                }">
+                    ${
+                        active
+                        ?
+                        "Active"
+                        :
+                        "Inactive"
+                    }
+                </span>
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* =========================================================
+   SUPPLIERS
+   ========================================================= */
+
+function renderSuppliers(){
+
+    const suppliers =
+        get(K.suppliers);
+
+
+    const tbody =
+        document
+        .getElementById("suppliersTable");
+
+
+    tbody.innerHTML="";
+
+
+    if(suppliers.length===0){
+
+        tbody.innerHTML=
+            `<tr>
+                <td colspan="8">
+                    No suppliers found.
+                </td>
+            </tr>`;
+
+        return;
+
+    }
+
+
+    suppliers.forEach(s=>{
+
+        const active =
+            s.active !== false;
+
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML = `
+
+            <td>${escapeHTML(s.id || "-")}</td>
+
+            <td>${escapeHTML(s.name || "-")}</td>
+
+            <td>${escapeHTML(s.phone || "-")}</td>
+
+            <td>${escapeHTML(s.cnic || "-")}</td>
+
+            <td>${Number(s.loginCount || 0)}</td>
+
+            <td>
+                ${
+                    s.lastLogin
+                    ?
+                    formatDate(s.lastLogin)
+                    :
+                    "-"
+                }
+            </td>
+
+            <td>
+                <span class="badge ${
+                    active
+                    ?
+                    "badgeGreen"
+                    :
+                    "badgeRed"
+                }">
+                    ${
+                        active
+                        ?
+                        "Active"
+                        :
+                        "Deactive"
+                    }
+                </span>
+            </td>
+
+            <td>
+
+                <button
+                    class="${
+                        active
+                        ?
+                        "btnRed"
+                        :
+                        "btnGreen"
+                    } smallBtn"
+                    onclick="toggleSupplier('${escapeAttr(s.id)}')"
+                >
+                    ${
+                        active
+                        ?
+                        "Deactive"
+                        :
+                        "Activate"
+                    }
+                </button>
+
+                <button
+                    class="btnOrange smallBtn"
+                    onclick="editSupplier('${escapeAttr(s.id)}')"
+                >
+                    Edit
+                </button>
+
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* =========================================================
+   ADD SUPPLIER
+   ========================================================= */
+
+function openSupplierModal(){
+
+    document
+    .getElementById("supplierModal")
+    .style.display="flex";
+
+
+    document
+    .getElementById("supplierModalTitle")
+    .textContent=
+        "Add Supplier";
+
+
+    document
+    .getElementById("editSupplierId")
+    .value="";
+
+
+    document
+    .getElementById("supplierId")
+    .value="";
+
+
+    document
+    .getElementById("supplierName")
+    .value="";
+
+
+    document
+    .getElementById("supplierPhone")
+    .value="";
+
+
+    document
+    .getElementById("supplierCNIC")
+    .value="";
+
+
+    document
+    .getElementById("supplierPassword")
+    .value="";
+
+}
+
+
+function closeSupplierModal(){
+
+    document
+    .getElementById("supplierModal")
+    .style.display="none";
+
+}
+
+
+/* =========================================================
+   EDIT SUPPLIER
+   ========================================================= */
+
+function editSupplier(id){
+
+    const suppliers =
+        get(K.suppliers);
+
+
+    const supplier =
+        suppliers.find(
+            s => String(s.id) === String(id)
+        );
+
+
+    if(!supplier){
+        return;
+    }
+
+
+    document
+    .getElementById("supplierModal")
+    .style.display="flex";
+
+
+    document
+    .getElementById("supplierModalTitle")
+    .textContent=
+        "Edit Supplier";
+
+
+    document
+    .getElementById("editSupplierId")
+    .value=
+        supplier.id || "";
+
+
+    document
+    .getElementById("supplierId")
+    .value=
+        supplier.id || "";
+
+
+    document
+    .getElementById("supplierName")
+    .value=
+        supplier.name || "";
+
+
+    document
+    .getElementById("supplierPhone")
+    .value=
+        supplier.phone || "";
+
+
+    document
+    .getElementById("supplierCNIC")
+    .value=
+        supplier.cnic || "";
+
+
+    document
+    .getElementById("supplierPassword")
+    .value=
+        supplier.password || "";
+
+}
+
+
+/* =========================================================
+   SAVE SUPPLIER
+   ========================================================= */
+
+function saveSupplier(){
+
+    const editId =
+        document
+        .getElementById("editSupplierId")
+        .value
+        .trim();
+
+
+    const id =
+        document
+        .getElementById("supplierId")
+        .value
+        .trim();
+
+
+    const name =
+        document
+        .getElementById("supplierName")
+        .value
+        .trim();
+
+
+    const phone =
+        document
+        .getElementById("supplierPhone")
+        .value
+        .trim();
+
+
+    const cnic =
+        document
+        .getElementById("supplierCNIC")
+        .value
+        .trim();
+
+
+    const password =
+        document
+        .getElementById("supplierPassword")
+        .value;
+
+
+    if(!id || !name || !password){
+
+        alert(
+            "Supplier ID, Name aur Password zaroor enter karo."
+        );
+
+        return;
+
+    }
+
+
+    const suppliers =
+        get(K.suppliers);
+
+
+    if(editId){
+
+        const supplier =
+            suppliers.find(
+                s =>
+                String(s.id)
+                ===
+                String(editId)
+            );
+
+
+        if(supplier){
+
+            supplier.id=id;
+
+            supplier.name=name;
+
+            supplier.phone=phone;
+
+            supplier.cnic=cnic;
+
+            supplier.password=password;
+
+            if(supplier.active===undefined){
+                supplier.active=true;
+            }
+
+        }
+
+    }else{
+
+        const exists =
+            suppliers.some(
+                s =>
+                String(s.id).toLowerCase()
+                ===
+                id.toLowerCase()
+            );
+
+
+        if(exists){
+
+            alert(
+                "Ye Supplier ID pehle se exist karti hai."
+            );
+
+            return;
+
+        }
+
+
+        suppliers.push({
+
+            id:id,
+
+            name:name,
+
+            phone:phone,
+
+            cnic:cnic,
+
+            password:password,
+
+            active:true,
+
+            loginCount:0,
+
+            lastLogin:"",
+
+            createdAt:
+                new Date().toISOString()
+
+        });
+
+    }
+
+
+    put(K.suppliers,suppliers);
+
+
+    closeSupplierModal();
+
+    renderAll();
+
+
+    alert("Supplier save ho gaya.");
+
+}
+
+
+/* =========================================================
+   TOGGLE SUPPLIER
+   ========================================================= */
+
+function toggleSupplier(id){
+
+    const suppliers =
+        get(K.suppliers);
+
+
+    const supplier =
+        suppliers.find(
+            s =>
+            String(s.id)
+            ===
+            String(id)
+        );
+
+
+    if(!supplier){
+        return;
+    }
+
+
+    supplier.active =
+        supplier.active === false;
+
+
+    put(K.suppliers,suppliers);
+
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   PRODUCTS
+   ========================================================= */
+
+function renderProducts(){
+
+    const products =
+        get(K.products);
+
+
+    const suppliers =
+        get(K.suppliers);
+
+
+    const tbody =
+        document
+        .getElementById("productsTable");
+
+
+    tbody.innerHTML="";
+
+
+    if(products.length===0){
+
+        tbody.innerHTML=
+            `<tr>
+                <td colspan="9">
+                    No products found.
+                </td>
+            </tr>`;
+
+        return;
+
+    }
+
+
+    products.forEach(p=>{
+
+        const supplier =
+            suppliers.find(
+                s =>
+                String(s.id)
+                ===
+                String(p.supplierId)
+            );
+
+
+        const active =
+            p.active !== false;
+
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML = `
+
+            <td>
+                ${
+                    p.image
+                    ?
+                    `<img
+                        class="productImg"
+                        src="${escapeAttr(p.image)}"
+                    >`
+                    :
+                    `<div class="productImg"></div>`
+                }
+            </td>
+
+            <td>
+                ${escapeHTML(p.id || "-")}
+            </td>
+
+            <td>
+                ${escapeHTML(p.name || "-")}
+            </td>
+
+            <td>
+                ${
+                    escapeHTML(
+                        p.supplierName ||
+                        supplier?.name ||
+                        "-"
+                    )
+                }
+            </td>
+
+            <td>
+                Rs ${Number(p.price || 0).toLocaleString()}
+            </td>
+
+            <td>
+                ${Number(p.stock || 0)}
+            </td>
+
+            <td>
+                <span class="badge badgeGreen">
+                    ${escapeHTML(p.approval || "Approved")}
+                </span>
+            </td>
+
+            <td>
+                <span class="badge ${
+                    active
+                    ?
+                    "badgeGreen"
+                    :
+                    "badgeRed"
+                }">
+                    ${
+                        active
+                        ?
+                        "Active"
+                        :
+                        "Private"
+                    }
+                </span>
+            </td>
+
+            <td>
+
+                <button
+                    class="btnOrange smallBtn"
+                    onclick="editProduct('${escapeAttr(p.id)}')"
+                >
+                    Edit
+                </button>
+
+                <button
+                    class="btnRed smallBtn"
+                    onclick="deleteProduct('${escapeAttr(p.id)}')"
+                >
+                    Delete
+                </button>
+
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* =========================================================
+   PRODUCT MODAL
+   ========================================================= */
+
+function openProductModal(){
+
+    fillSupplierSelect();
+
+
+    document
+    .getElementById("productModal")
+    .style.display="flex";
+
+
+    document
+    .getElementById("productModalTitle")
+    .textContent=
+        "Add Product";
+
+
+    document
+    .getElementById("editProductId")
+    .value="";
+
+
+    document
+    .getElementById("productName")
+    .value="";
+
+
+    document
+    .getElementById("productPrice")
+    .value="";
+
+
+    document
+    .getElementById("productStock")
+    .value="";
+
+
+    document
+    .getElementById("productDescription")
+    .value="";
+
+
+    document
+    .getElementById("productImage")
+    .value="";
+
+}
+
+
+function closeProductModal(){
+
+    document
+    .getElementById("productModal")
+    .style.display="none";
+
+}
+
+
+/* =========================================================
+   SUPPLIER SELECT
+   ========================================================= */
+
+function fillSupplierSelect(){
+
+    const select =
+        document
+        .getElementById("productSupplier");
+
+
+    const suppliers =
+        get(K.suppliers);
+
+
+    select.innerHTML=
+        `<option value="">
+            Select Supplier
+        </option>`;
+
+
+    suppliers.forEach(s=>{
+
+        const option =
+            document.createElement("option");
+
+
+        option.value=s.id;
+
+
+        option.textContent =
+            `${s.name || "Supplier"} (${s.id})`;
+
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+/* =========================================================
+   EDIT PRODUCT
+   ========================================================= */
+
+function editProduct(id){
+
+    fillSupplierSelect();
+
+
+    const products =
+        get(K.products);
+
+
+    const product =
+        products.find(
+            p =>
+            String(p.id)
+            ===
+            String(id)
+        );
+
+
+    if(!product){
+        return;
+    }
+
+
+    document
+    .getElementById("productModal")
+    .style.display="flex";
+
+
+    document
+    .getElementById("productModalTitle")
+    .textContent=
+        "Edit Product";
+
+
+    document
+    .getElementById("editProductId")
+    .value=
+        product.id || "";
+
+
+    document
+    .getElementById("productName")
+    .value=
+        product.name || "";
+
+
+    document
+    .getElementById("productSupplier")
+    .value=
+        product.supplierId || "";
+
+
+    document
+    .getElementById("productPrice")
+    .value=
+        product.price || "";
+
+
+    document
+    .getElementById("productStock")
+    .value=
+        product.stock || "";
+
+
+    document
+    .getElementById("productDescription")
+    .value=
+        product.description || "";
+
+
+    document
+    .getElementById("productImage")
+    .value="";
+
+}
+
+
+/* =========================================================
+   SAVE PRODUCT
+   ========================================================= */
+
+function saveProduct(){
+
+    const editId =
+        document
+        .getElementById("editProductId")
+        .value
+        .trim();
+
+
+    const name =
+        document
+        .getElementById("productName")
+        .value
+        .trim();
+
+
+    const supplierId =
+        document
+        .getElementById("productSupplier")
+        .value
+        .trim();
+
+
+    const price =
+        Number(
+            document
+            .getElementById("productPrice")
+            .value
+        );
+
+
+    const stock =
+        Number(
+            document
+            .getElementById("productStock")
+            .value
+        );
+
+
+    const description =
+        document
+        .getElementById("productDescription")
+        .value
+        .trim();
+
+
+    const imageInput =
+        document
+        .getElementById("productImage");
+
+
+    if(!name || !supplierId){
+
+        alert(
+            "Product Name aur Supplier select karo."
+        );
+
+        return;
+
+    }
+
+
+    const suppliers =
+        get(K.suppliers);
+
+
+    const supplier =
+        suppliers.find(
+            s =>
+            String(s.id)
+            ===
+            String(supplierId)
+        );
+
+
+    if(!supplier){
+
+        alert("Supplier nahi mila.");
+
+        return;
+
+    }
+
+
+    const products =
+        get(K.products);
+
+
+    const finishSave =
+        imageData => {
+
+            if(editId){
+
+                const product =
+                    products.find(
+                        p =>
+                        String(p.id)
+                        ===
+                        String(editId)
+                    );
+
+
+                if(product){
+
+                    product.name=name;
+
+                    product.supplierId=
+                        supplier.id;
+
+                    product.supplierName=
+                        supplier.name;
+
+                    product.price=price;
+
+                    product.stock=stock;
+
+                    product.description=
+                        description;
+
+                    if(imageData){
+                        product.image=imageData;
+                    }
+
+                    if(product.approval===undefined){
+                        product.approval="Approved";
+                    }
+
+                    if(product.active===undefined){
+                        product.active=true;
+                    }
+
+                }
+
+            }else{
+
+                const productId =
+                    "PROD" +
+                    Date.now();
+
+
+                products.push({
+
+                    id:productId,
+
+                    name:name,
+
+                    supplierId:
+                        supplier.id,
+
+                    supplierName:
+                        supplier.name,
+
+                    price:price,
+
+                    stock:stock,
+
+                    description:
+                        description,
+
+                    image:
+                        imageData || "",
+
+                    approval:
+                        "Approved",
+
+                    active:true,
+
+                    createdAt:
+                        new Date().toISOString()
+
+                });
+
+            }
+
+
+            put(K.products,products);
+
+
+            closeProductModal();
+
+            renderAll();
+
+
+            alert(
+                "Product save ho gaya."
+            );
+
+        };
+
+
+    if(imageInput.files &&
+       imageInput.files[0]){
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload =
+            function(){
+
+                finishSave(
+                    reader.result
+                );
+
+            };
+
+
+        reader.readAsDataURL(
+            imageInput.files[0]
+        );
+
+    }else{
+
+        finishSave("");
+
+    }
+
+}
+
+
+/* =========================================================
+   DELETE PRODUCT
+   ========================================================= */
+
+function deleteProduct(id){
+
+    if(
+        !confirm(
+            "Kya aap is product ko delete karna chahte hain?"
+        )
+    ){
+        return;
+    }
+
+
+    let products =
+        get(K.products);
+
+
+    products =
+        products.filter(
+            p =>
+            String(p.id)
+            !==
+            String(id)
+        );
+
+
+    put(K.products,products);
+
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   ORDERS
+   ========================================================= */
+
+function renderOrders(){
+
+    const orders =
+        get(K.orders);
+
+
+    const tbody =
+        document
+        .getElementById("ordersTable");
+
+
+    tbody.innerHTML="";
+
+
+    if(orders.length===0){
+
+        tbody.innerHTML=
+            `<tr>
+                <td colspan="8">
+                    No orders found.
+                </td>
+            </tr>`;
+
+        return;
+
+    }
+
+
+    [...orders]
+    .reverse()
+    .forEach(o=>{
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML = `
+
+            <td>
+                ${escapeHTML(o.id || "-")}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    o.customer?.name ||
+                    o.customerName ||
+                    "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    o.product ||
+                    o.productName ||
+                    "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    o.supplierName ||
+                    "-"
+                )}
+            </td>
+
+            <td>
+                ${Number(o.quantity || 1)}
+            </td>
+
+            <td>
+                Rs ${Number(o.amount || 0).toLocaleString()}
+            </td>
+
+            <td>
+                <span class="badge badgeBlue">
+                    ${escapeHTML(o.status || "Pending")}
+                </span>
+            </td>
+
+            <td>
+                ${
+                    o.createdAt
+                    ?
+                    formatDate(o.createdAt)
+                    :
+                    "-"
+                }
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* =========================================================
+   SALES
+   ========================================================= */
+
+function renderSales(){
+
+    const orders =
+        get(K.orders);
+
+
+    let total=0;
+
+
+    orders.forEach(
+        o =>
+        total += Number(o.amount || 0)
+    );
+
+
+    const supplierShare =
+        total * .90;
+
+
+    const gorayaShare =
+        total * .10;
+
+
+    document
+    .getElementById("salesTotal")
+    .textContent=
+        "Rs " +
+        total.toLocaleString();
+
+
+    document
+    .getElementById("supplierShare")
+    .textContent=
+        "Rs " +
+        supplierShare.toLocaleString();
+
+
+    document
+    .getElementById("gorayaShare")
+    .textContent=
+        "Rs " +
+        gorayaShare.toLocaleString();
+
+
+    const tbody =
+        document
+        .getElementById("salesTable");
+
+
+    tbody.innerHTML="";
+
+
+    orders.forEach(o=>{
+
+        const amount =
+            Number(o.amount || 0);
+
+
+        const supplier =
+            amount * .90;
+
+
+        const goraya =
+            amount * .10;
+
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML=`
+
+            <td>
+                ${
+                    o.createdAt
+                    ?
+                    formatDate(o.createdAt)
+                    :
+                    "-"
+                }
+            </td>
+
+            <td>
+                ${escapeHTML(o.id || "-")}
+            </td>
+
+            <td>
+                ${escapeHTML(o.product || "-")}
+            </td>
+
+            <td>
+                ${escapeHTML(o.supplierName || "-")}
+            </td>
+
+            <td>
+                Rs ${amount.toLocaleString()}
+            </td>
+
+            <td>
+                Rs ${supplier.toLocaleString()}
+            </td>
+
+            <td>
+                Rs ${goraya.toLocaleString()}
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* =========================================================
+   PAYMENTS
+   ========================================================= */
+
+function loadPayments(){
+
+    const payment =
+        getObject(K.payments);
+
+
+    document
+    .getElementById("paymentMethod")
+    .value =
+        payment.method ||
+        "Cash on Delivery";
+
+
+    document
+    .getElementById("paymentAccount")
+    .value =
+        payment.account ||
+        "";
+
+
+    document
+    .getElementById("paymentName")
+    .value =
+        payment.name ||
+        "";
+
+
+    document
+    .getElementById("paymentBank")
+    .value =
+        payment.bank ||
+        "";
+
+
+    document
+    .getElementById("paymentInstructions")
+    .value =
+        payment.instructions ||
+        "";
+
+}
+
+
+function savePayments(){
+
+    const payment={
+
+        method:
+            document
+            .getElementById("paymentMethod")
+            .value,
+
+        account:
+            document
+            .getElementById("paymentAccount")
+            .value
+            .trim(),
+
+        name:
+            document
+            .getElementById("paymentName")
+            .value
+            .trim(),
+
+        bank:
+            document
+            .getElementById("paymentBank")
+            .value
+            .trim(),
+
+        instructions:
+            document
+            .getElementById("paymentInstructions")
+            .value
+            .trim()
+
+    };
+
+
+    /*
+       PAYMENT SETTINGS KA DATA
+       PRODUCTS YA SUPPLIERS KE DATA
+       SE ALAG STORAGE ME SAVE HOGA.
+    */
+
+    put(
+        K.payments,
+        payment
+    );
+
+
+    alert(
+        "Payment Settings save ho gayi hain."
+    );
+
+}
+
+
+/* =========================================================
+   LEDGER
+   ========================================================= */
+
+function renderLedger(){
+
+    const orders =
+        get(K.orders);
+
+
+    let selectedDate =
+        document
+        .getElementById("ledgerDate")
+        .value;
+
+
+    if(!selectedDate){
+
+        selectedDate =
+            new Date()
+            .toISOString()
+            .slice(0,10);
+
+    }
+
+
+    const filtered =
+        orders.filter(
+            o =>
+            String(o.createdAt || "")
+            .slice(0,10)
+            ===
+            selectedDate
+        );
+
+
+    let total=0;
+
+
+    filtered.forEach(
+        o =>
+        total += Number(o.amount || 0)
+    );
+
+
+    document
+    .getElementById("ledgerOrders")
+    .textContent =
+        filtered.length;
+
+
+    document
+    .getElementById("ledgerSales")
+    .textContent =
+        "Rs " +
+        total.toLocaleString();
+
+
+    document
+    .getElementById("ledgerSupplier")
+    .textContent =
+        "Rs " +
+        (total*.90).toLocaleString();
+
+
+    document
+    .getElementById("ledgerGoraya")
+    .textContent =
+        "Rs " +
+        (total*.10).toLocaleString();
+
+
+    const tbody =
+        document
+        .getElementById("ledgerTable");
+
+
+    tbody.innerHTML="";
+
+
+    filtered.forEach(o=>{
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML=`
+
+            <td>
+                ${escapeHTML(o.id || "-")}
+            </td>
+
+            <td>
+                ${escapeHTML(
+                    o.customer?.name ||
+                    o.customerName ||
+                    "-"
+                )}
+            </td>
+
+            <td>
+                ${escapeHTML(o.product || "-")}
+            </td>
+
+            <td>
+                ${escapeHTML(o.supplierName || "-")}
+            </td>
+
+            <td>
+                Rs ${Number(o.amount || 0).toLocaleString()}
+            </td>
+
+            <td>
+                ${escapeHTML(o.status || "Pending")}
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* =========================================================
+   ADMIN ACCOUNT
+   ========================================================= */
+
+function renderAdminAccount(){
+
+    const session =
+        getObject(K.session);
+
+
+    if(!session || !session.id){
+        return;
+    }
+
+
+    const admins =
+        get(K.admins);
+
+
+    const admin =
+        admins.find(
+            a =>
+            String(a.id)
+            ===
+            String(session.id)
+        );
+
+
+    if(!admin){
+        return;
+    }
+
+
+    document
+    .getElementById("currentAdminId")
+    .textContent =
+        admin.username || "-";
+
+
+    document
+    .getElementById("currentAdminName")
+    .textContent =
+        admin.name || "-";
+
+}
+
+
+/* =========================================================
+   CHANGE ADMIN ID
+   ========================================================= */
+
+function changeAdminUsername(){
+
+    const newUsername =
+        document
+        .getElementById("newAdminUsername")
+        .value
+        .trim();
+
+
+    if(!newUsername){
+
+        alert(
+            "New Admin ID enter karo."
+        );
+
+        return;
+
+    }
+
+
+    if(newUsername.length < 3){
+
+        alert(
+            "Admin ID kam az kam 3 characters ki honi chahiye."
+        );
+
+        return;
+
+    }
+
+
+    const session =
+        getObject(K.session);
+
+
+    const admins =
+        get(K.admins);
+
+
+    const admin =
+        admins.find(
+            a =>
+            String(a.id)
+            ===
+            String(session.id)
+        );
+
+
+    if(!admin){
+
+        alert(
+            "Admin account nahi mila."
+        );
+
+        return;
+
+    }
+
+
+    const duplicate =
+        admins.some(
+            a =>
+            String(a.id)
+            !==
+            String(admin.id)
+            &&
+            String(a.username || "")
+            .toLowerCase()
+            ===
+            newUsername.toLowerCase()
+        );
+
+
+    if(duplicate){
+
+        alert(
+            "Ye Admin ID pehle se use ho rahi hai."
+        );
+
+        return;
+
+    }
+
+
+    const oldUsername =
+        admin.username;
+
+
+    admin.username =
+        newUsername;
+
+
+    put(K.admins,admins);
+
+
+    session.username =
+        newUsername;
+
+
+    localStorage.setItem(
+        K.session,
+        JSON.stringify(session)
+    );
+
+
+    document
+    .getElementById("newAdminUsername")
+    .value="";
+
+
+    renderAdminAccount();
+
+
+    alert(
+        "Admin ID change ho gayi.\n\n" +
+        "Purani ID: " +
+        oldUsername +
+        "\n" +
+        "New ID: " +
+        newUsername
+    );
+
+}
+
+
+/* =========================================================
+   CHANGE ADMIN PASSWORD
+   ========================================================= */
+
+function changeAdminPassword(){
+
+    const current =
+        document
+        .getElementById("currentAdminPassword")
+        .value;
+
+
+    const newPassword =
+        document
+        .getElementById("newAdminPassword")
+        .value;
+
+
+    const confirmPassword =
+        document
+        .getElementById("confirmAdminPassword")
+        .value;
+
+
+    if(!current ||
+       !newPassword ||
+       !confirmPassword){
+
+        alert(
+            "Teeno password fields fill karo."
+        );
+
+        return;
+
+    }
+
+
+    if(newPassword.length < 4){
+
+        alert(
+            "New password kam az kam 4 characters ka hona chahiye."
+        );
+
+        return;
+
+    }
+
+
+    if(newPassword !== confirmPassword){
+
+        alert(
+            "New password aur confirm password same nahi hain."
+        );
+
+        return;
+
+    }
+
+
+    const session =
+        getObject(K.session);
+
+
+    const admins =
+        get(K.admins);
+
+
+    const admin =
+        admins.find(
+            a =>
+            String(a.id)
+            ===
+            String(session.id)
+        );
+
+
+    if(!admin){
+
+        alert(
+            "Admin account nahi mila."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        String(admin.password)
+        !==
+        String(current)
+    ){
+
+        alert(
+            "Current password wrong hai."
+        );
+
+        return;
+
+    }
+
+
+    admin.password =
+        newPassword;
+
+
+    put(K.admins,admins);
+
+
+    document
+    .getElementById("currentAdminPassword")
+    .value="";
+
+
+    document
+    .getElementById("newAdminPassword")
+    .value="";
+
+
+    document
+    .getElementById("confirmAdminPassword")
+    .value="";
+
+
+    alert(
+        "Password successfully change ho gaya."
+    );
+
+}
+
+
+/* =========================================================
+   RENDER ALL
+   ========================================================= */
+
+function renderAll(){
+
+    renderDashboard();
+
+    renderCustomers();
+
+    renderSuppliers();
+
+    renderProducts();
+
+    renderOrders();
+
+    renderSales();
+
+    loadPayments();
+
+    renderLedger();
+
+    renderAdminAccount();
+
+}
+
+
+/* =========================================================
+   DATE
+   ========================================================= */
+
+function formatDate(value){
+
+    try{
+
+        return new Date(value)
+        .toLocaleString();
+
+    }catch(e){
+
+        return "-";
+
+    }
+
+}
+
+
+/* =========================================================
+   SECURITY / HTML ESCAPE
+   ========================================================= */
+
+function escapeHTML(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+function escapeAttr(value){
+
+    return String(value ?? "")
+        .replace(/\\/g,"\\\\")
+        .replace(/'/g,"\\'")
+        .replace(/"/g,"&quot;");
+
+}
+
+
+/* =========================================================
+   ANIMATED STARS
+   ========================================================= */
+
+function createStars(){
+
+    const container =
+        document.getElementById("stars");
+
+
+    for(let i=0;i<80;i++){
+
+        const star =
+            document.createElement("div");
+
+
+        star.className="star";
+
+
+        star.style.left =
+            Math.random()*100 + "%";
+
+
+        star.style.animationDuration =
+            (4 + Math.random()*8) + "s";
+
+
+        star.style.animationDelay =
+            (-Math.random()*10) + "s";
+
+
+        star.style.width =
+            (1 + Math.random()*3) + "px";
+
+
+        star.style.height =
+            star.style.width;
+
+
+        container.appendChild(star);
+
+    }
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+setup();
+
+createStars();
+
+
+/*
+   Agar pehle se login session hai
+   to direct Admin Panel open hoga.
+*/
+
+const existingSession =
+    getObject(K.session);
+
+
+if(
+    existingSession &&
+    existingSession.id
+){
+
+    openApp();
+
+}else{
+
+    document
+    .getElementById("loginScreen")
+    .style.display="flex";
+
+}
+
+</script>
+
+</body>
+</html>
